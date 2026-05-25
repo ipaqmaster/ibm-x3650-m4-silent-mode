@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ $UID -ne 0 ] && command -v sudo >/dev/null 2>&1 && SUDO=sudo # Use sudo if not root
+
 ipmi_output=$(ipmitool sdr 2>/dev/null)
 fan_zones=($(echo "$ipmi_output" | grep 'Fan [0-9][A-Z] Tach' | awk -F'|' '{print $1}' | awk '{print $2}'))
 
@@ -47,11 +49,11 @@ while true; do
   for fan_zone in "${fan_zones[@]}"; do
     if [[ "$fan_zone" == *A ]]; then
       i=$((i+1))
-      sudo ipmitool raw 0x3a 0x07 0x0${i} 0x$fan_speed_hex 0x01 > /dev/null 2>&1 &
+      ${SUDO} ipmitool raw 0x3a 0x07 0x0${i} 0x$fan_speed_hex 0x01 > /dev/null 2>&1 &
     fi
   done
 
   # Apply the changes
-  sudo ipmitool raw 0x3a 0x06 > /dev/null 2>&1
+  ${SUDO} ipmitool raw 0x3a 0x06 > /dev/null 2>&1
 
 done
