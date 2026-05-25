@@ -87,4 +87,6 @@ while true; do
   # Apply the changes
   ${SUDO} ipmitool raw 0x3a 0x06 > /dev/null 2>&1
 
+  sleep 5
+
 done
